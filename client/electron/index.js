@@ -1,5 +1,8 @@
 const path = require("path");
 const { app, BrowserWindow } = require("electron");
+const { ReadStream, read } = require("fs");
+const ipc = require("electron").ipcMain;
+const reader = require("./scripts/reader");
 
 const isDev = process.env.IS_DEV == "true" ? true : false;
 
@@ -9,8 +12,9 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
+      contextIsolation: false,
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
@@ -36,6 +40,12 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+  ipc.on("start", async (event, data) => {
+    //console.log(data);
+    await reader.readData();
+    await reader.runWorker(data);
+    console.log("completed");
   });
 });
 

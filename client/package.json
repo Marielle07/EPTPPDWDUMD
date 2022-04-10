@@ -14,8 +14,12 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.13.4",
+    "@tensorflow/tfjs-node": "^3.15.0",
     "axios": "^0.26.1",
     "quasar": "^2.6.2",
+    "serialport": "^9.2.8",
+    "tiny-worker": "^2.3.0",
+    "vite-plugin-electron-builder": "^0.1.0",
     "vue": "^3.2.25",
     "vue-router": "^4.0.14",
     "vuex": "^4.0.2"
@@ -27,8 +31,10 @@
     "cross-env": "^7.0.3",
     "electron": "^18.0.0",
     "electron-builder": "^22.14.13",
+    "electron-rebuild": "^3.2.7",
     "sass": "^1.32.0",
     "vite": "^2.8.0",
+    "vite-plugin-electron-renderer": "^0.3.3",
     "wait-on": "^6.0.1"
   },
   "build": {

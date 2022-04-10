@@ -8,3 +8,6 @@ window.addEventListener("DOMContentLoaded", () => {
     replaceText(`${dependency}-version`, process.versions[dependency]);
   }
 });
+
+const { ipcRenderer } = require("electron");
+window.ipcRenderer = ipcRenderer;

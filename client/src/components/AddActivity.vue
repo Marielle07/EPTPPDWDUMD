@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
 export default {
   data: () => ({
     progress: null,
@@ -55,6 +56,7 @@ export default {
   },
   methods: {
     startTimer() {
+      window.ipcRenderer.send("start", this.$store.state.activityName);
       this.progress = 0;
       //this.recordStatus = "started";
       this.interval = setInterval(() => {

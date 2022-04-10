@@ -35,8 +35,9 @@ export default {
   created() {
     this.$store.commit(
       "setActivities",
-      JSON.parse(localStorage.getItem("activities"))
+      JSON.parse(localStorage.getItem("activities")) || []
     );
+    //console.log(localStorage.getItem("activities"));
   },
 };
 </script>
