@@ -49,19 +49,24 @@ export default {
           "activities",
           JSON.stringify(this.$store.state.activities)
         );
+
         return "completed";
       }
+
       return "";
     },
   },
   methods: {
     startTimer() {
-      window.ipcRenderer.send("start", this.$store.state.activityName);
       this.progress = 0;
       //this.recordStatus = "started";
       this.interval = setInterval(() => {
         this.progress += 1;
       }, 1000);
+      ipcRenderer.invoke("start", this.$store.state.activityName).then(() => {
+        ipcRenderer.invoke("train");
+      });
+
       // if (this.progress > 20) {
       //   clearInterval(this.interval);
       //   this.recordStatus = "completed";

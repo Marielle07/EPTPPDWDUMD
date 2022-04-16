@@ -3,6 +3,7 @@ const { app, BrowserWindow } = require("electron");
 const { ReadStream, read } = require("fs");
 const ipc = require("electron").ipcMain;
 const reader = require("./scripts/reader");
+const prototype = require("./scripts/prototype");
 
 const isDev = process.env.IS_DEV == "true" ? true : false;
 
@@ -41,11 +42,24 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-  ipc.on("start", async (event, data) => {
+  ipc.handle("start", async (event, data) => {
     //console.log(data);
     await reader.readData();
     await reader.runWorker(data);
     console.log("completed");
+    return;
+  });
+  ipc.handle("train", async (event, data) => {
+    await require("./scripts/model_generator");
+    console.log("Trained!");
+    return;
+  });
+
+  ipc.handle("prototype", async (event, data) => {
+    console.log(data);
+    await prototype.runWorker(JSON.parse(data));
+
+    return;
   });
 });
 

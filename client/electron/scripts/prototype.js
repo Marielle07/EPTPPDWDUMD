@@ -10,29 +10,31 @@ const { port, parser } = require("./reader");
 var currArr = [];
 var liveData = [];
 
-var worker = new Worker(function () {
-  self.onmessage = function (ev) {
-    postMessage(ev.data);
-  };
-});
+const runWorker = async (gestureClasses) => {
+  var worker = new Worker(function () {
+    self.onmessage = function (ev) {
+      postMessage(ev.data);
+    };
+  });
 
-worker.onmessage = function (ev) {
-  console.log(ev.data);
-  secondtimer();
-  worker.terminate();
+  worker.onmessage = function (ev) {
+    //console.log(ev.data);
+    secondtimer(gestureClasses);
+    worker.terminate();
+  };
+
+  worker.postMessage("Start 2 second timer.");
+  startReadingData();
 };
 
-worker.postMessage("Start 2 second timer.");
-startReadingData();
-
-async function secondtimer() {
+async function secondtimer(gestureClasses) {
   while (true) {
-    await sleep(2000);
-    console.log("Two seconds has passed");
+    // await sleep(2000);
+    // console.log("Two seconds has passed");
 
     var data = currArr;
     var removed = currArr.splice(15);
-    flatterAndPredicter(data);
+    flatterAndPredicter(data, gestureClasses);
 
     currArr = [];
   }
@@ -58,10 +60,12 @@ function startReadingData() {
 
 //experimental
 var ctr = 0;
-function flatterAndPredicter(arr) {
+function flatterAndPredicter(arr, gestureClasses) {
   if (ctr == 0) {
   } else {
-    pre.startPredict(arr.flat());
+    pre.startPredict(arr.flat(), gestureClasses);
   }
   ctr++;
 }
+
+module.exports = { runWorker };

@@ -33,13 +33,17 @@ const runWorker = async (dir) => {
 async function secondtimer(dir) {
   //[...Array(10)].forEach(async (_, i) => {
   var i = 0;
+  var numFiles = fs.readdirSync("./data", (err, files) => {
+    withFileTypes: true;
+  });
   while (i <= 10) {
     await sleep(2000);
     console.log("Two seconds has passed");
-    const dirIndex = gestureClasses
-      .map((x) => x.toLowerCase())
-      .indexOf(dir.toLowerCase());
-    var tempo = fileSaver.start(initArr, dirIndex);
+
+    //const dirIndex = gestureClasses
+    //.map((x) => x.toLowerCase())
+    // .indexOf(dir.toLowerCase());
+    var tempo = fileSaver.start(initArr, numFiles.length / 10);
     fs.writeFile(
       `data/${dir.toLowerCase()}${i}.json`,
       JSON.stringify(tempo, null, 2),

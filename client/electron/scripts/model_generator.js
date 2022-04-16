@@ -12,47 +12,56 @@ console.log(numFiles);
 var files = fs.readdirSync(folderName);
 
 // Get Data from Files and Merge
-var dataArray = [];
-for (var ctr = 0; ctr < numFiles.length; ctr++) {
-  dataArray.push(
-    JSON.parse(
-      fs.readFileSync(`data/` + files[ctr], "utf8", (err, data) => {
-        return data;
-      })
-    )
+var dataArray = numFiles.map((x) => {
+  return JSON.parse(
+    fs.readFileSync(`data/` + x, "utf8", (err, data) => {
+      return data;
+    })
   );
-}
+});
+console.log(dataArray);
+
+// for (var ctr = 1; ctr <= numFiles.length; ctr++) {
+//   dataArray.push(
+//     JSON.parse(
+//       fs.readFileSync(`data/` + numfiles[ctr], "utf8", (err, data) => {
+//         return data;
+//       })
+//     )
+//   );
+// }
 
 // Formatting Data; Note: Number of Empty Array should match the number of labels
-var _labels = [[""], [""], [""]];
-var _features = [[""], [""], [""]];
-for (var ctr = 0; ctr < dataArray.length; ctr++) {
-  var obj = dataArray[ctr];
-  var objL = obj["label"];
-  var objF = obj["features"];
-  _labels[objL].push(objL);
-  _features[objL].push(objF);
-}
-for (var ctr = 0; ctr < _labels.length; ctr++) {
-  _labels[ctr].shift();
-  _features[ctr].shift();
-}
+var _labels = dataArray.map((x) => x.label);
+var _features = dataArray.map((x) => x.features);
+// for (var ctr = 0; ctr < dataArray.length; ctr++) {
+//   var obj = dataArray[ctr];
+//   var objL = obj["label"];
+//   var objF = obj["features"];
+//   _labels[objL].push(objL);
+//   _features[objL].push(objF);
+// }
+// for (var ctr = 0; ctr < _labels.length; ctr++) {
+//   _labels[ctr].shift();
+//   _features[ctr].shift();
+// }
 
 // Converting to Tensors
 _labels = _labels.flat();
-_features = _features.flat();
-const numOfLabels = 3;
+console.log(_features);
+const numOfLabels = dataArray.length / 10;
 
-var numSamplesPerGesture = 30; //number of files
-var totalNumDataPerFile = 90;
+var numSamplesPerGesture = dataArray.length; //number of files
+var totalNumDataPerFile = 15;
 convertToTensors(_features, _labels);
 var featuresTensor;
 var labelsTensor;
 function convertToTensors(featuresData, labelData) {
-  featuresTensor = tf.tensor2d(featuresData, [
-    numSamplesPerGesture,
-    totalNumDataPerFile,
-  ]);
+  featuresTensor = tf.tensor2d(
+    featuresData
+    //numSamplesPerGesture,
+    //totalNumDataPerFile,
+  );
   labelsTensor = tf.oneHot(tf.tensor1d(labelData).toInt(), numOfLabels);
 }
 

@@ -37,7 +37,7 @@
           color="white"
           label-color="white"
         ></q-input> -->
-        <q-btn label="Start" />
+        <q-btn label="Start" @click="startPrototype" />
       </div>
 
       <q-btn
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
 export default {
   data: () => ({
     activityName: "",
@@ -57,6 +58,15 @@ export default {
     timers: [2, 4, 6, 8, 10],
     timer: 2,
   }),
+  methods: {
+    startPrototype() {
+      ipcRenderer
+        .invoke("prototype", JSON.stringify(this.$store.state.activities))
+        .then(() => {
+          console.log("start");
+        });
+    },
+  },
   created() {
     // this.activites = JSON.parse(localStorage.getItem("activities"));
     this.activities = this.$store.state.activities;
