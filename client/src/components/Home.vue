@@ -25,13 +25,46 @@
           color="primary"
           label="Exercise Mode"
         />
+        <q-btn
+          @click="togglePort"
+          no-caps
+          push
+          color="primary"
+          label="Toggle Port"
+        />
+        <q-btn
+          @click="loadData"
+          no-caps
+          push
+          color="primary"
+          label="Load Data"
+        />
+        <q-btn
+          @click="createModel"
+          no-caps
+          push
+          color="primary"
+          label="create model"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
 export default {
+  methods: {
+    togglePort() {
+      ipcRenderer.invoke("toggle-port");
+    },
+    loadData() {
+      ipcRenderer.invoke("load-data", "Jump");
+    },
+    createModel() {
+      ipcRenderer.invoke("create-model");
+    },
+  },
   created() {
     this.$store.commit(
       "setActivities",

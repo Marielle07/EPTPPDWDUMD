@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { ipcRenderer } from "electron";
 export default {
   data: () => ({
     activityName: "",
@@ -39,6 +40,7 @@ export default {
   methods: {
     next() {
       this.$store.commit("setActivityName", this.activityName);
+      ipcRenderer.invoke("record-activity", this.activityName);
       this.$router.push("/add-activity");
     },
   },

@@ -1,7 +1,7 @@
 const tf = require("@tensorflow/tfjs");
 require("@tensorflow/tfjs-node");
 
-const gestureClasses = ["Center", "Left", "Right"];
+//const gestureClasses = ["Center", "Left", "Right"];
 var model;
 var _liveData;
 const init = async (liveData, gestureClasses) => {
@@ -26,4 +26,4 @@ function startPredict(liveData, gestureClasses) {
 //liveData1 = []
 // startPredict(liveData1)
 
-module.exports = { startPredict, gestureClasses };
+module.exports = { startPredict };

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "gl": "^5.0.0",
     "port": "^0.8.1",
     "serial": "^0.0.9"
   }

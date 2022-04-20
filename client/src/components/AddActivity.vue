@@ -39,10 +39,10 @@ export default {
   }),
   computed: {
     recordStatus() {
-      if (this.progress >= 0 && this.progress <= 20 && this.progress !== null) {
+      if (this.progress >= 0 && this.progress <= 5 && this.progress !== null) {
         return "started";
       }
-      if (this.progress > 20) {
+      if (this.progress > 5) {
         clearInterval(this.interval);
         this.$store.commit("pushActivity", this.$store.state.activityName);
         localStorage.setItem(
@@ -63,9 +63,15 @@ export default {
       this.interval = setInterval(() => {
         this.progress += 1;
       }, 1000);
-      ipcRenderer.invoke("start", this.$store.state.activityName).then(() => {
-        ipcRenderer.invoke("train");
-      });
+
+      ipcRenderer.invoke("record-activity-start");
+      setTimeout(() => {
+        ipcRenderer.invoke("record-activity-stop");
+      }, 5000);
+
+      // ipcRenderer.invoke("start", this.$store.state.activityName).then(() => {
+      //   ipcRenderer.invoke("train");
+      // });
 
       // if (this.progress > 20) {
       //   clearInterval(this.interval);

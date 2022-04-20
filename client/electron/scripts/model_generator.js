@@ -7,7 +7,6 @@ var folderName = "./data";
 var numFiles = fs.readdirSync(folderName, (err, files) => {
   withFileTypes: true;
 });
-console.log(numFiles);
 // Get File name of Files
 var files = fs.readdirSync(folderName);
 
@@ -19,7 +18,6 @@ var dataArray = numFiles.map((x) => {
     })
   );
 });
-console.log(dataArray);
 
 // for (var ctr = 1; ctr <= numFiles.length; ctr++) {
 //   dataArray.push(
@@ -48,7 +46,6 @@ var _features = dataArray.map((x) => x.features);
 
 // Converting to Tensors
 _labels = _labels.flat();
-console.log(_features);
 const numOfLabels = dataArray.length / 10;
 
 var numSamplesPerGesture = dataArray.length; //number of files
@@ -79,6 +76,8 @@ function splitter() {
     [0, 0],
     [numTrainExamples, totalNumDataPerFile]
   );
+  console.log("training features", trainingFeatures);
+
   const testingFeatures = featuresTensor.slice(
     [numTrainExamples, 0],
     [numTestExamples, totalNumDataPerFile]

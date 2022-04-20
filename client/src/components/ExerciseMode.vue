@@ -60,11 +60,12 @@ export default {
   }),
   methods: {
     startPrototype() {
-      ipcRenderer
-        .invoke("prototype", JSON.stringify(this.$store.state.activities))
-        .then(() => {
-          console.log("start");
-        });
+      ipcRenderer.invoke("train", JSON.stringify(this.$store.state.activities));
+      // ipcRenderer
+      //   .invoke("prototype", JSON.stringify(this.$store.state.activities))
+      //   .then(() => {
+      //     console.log("start");
+      //   });
     },
   },
   created() {

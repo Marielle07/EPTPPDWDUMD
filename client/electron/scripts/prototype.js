@@ -29,7 +29,7 @@ const runWorker = async (gestureClasses) => {
 
 async function secondtimer(gestureClasses) {
   while (true) {
-    // await sleep(2000);
+    await sleep(2000);
     // console.log("Two seconds has passed");
 
     var data = currArr;
