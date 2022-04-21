@@ -3,7 +3,6 @@ const Readline = require("@serialport/parser-readline");
 const fs = require("fs");
 
 function device() {
-  const positions = ["X", "Y", "Z", "A", "B", "C"];
   const port = new SerialPort("COM4", { baudRate: 9600, autoOpen: false });
   const parser = port.pipe(new Readline());
 
@@ -15,34 +14,24 @@ function device() {
     console.log("Closed!");
   });
 
-  /* Testing Data
-    {
-        activity: [
-            { X: 0.4, Y: -0.4, Z: -10.7, A: 0, B: 0, C: 0 },
-            { X: 0.4, Y: -0.4, Z: -10.7, A: 0, B: 0, C: 0 },
-            { X: 0.4, Y: -0.4, Z: -10.7, A: 0, B: 0, C: 0 },
-            ...
-        ],
-        label: "Push Ups"
-    } 
-  */
+  parser.on("data", (data) => {
+    if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+      console.log({
+        activity: data.split(",").map((x, i) => parseFloat(x)),
+        label: "idle",
+      });
+    }
+  });
 
-  /*
-    Training Data
-    [
-      {
-          activity: [...],
-          label: "Push Ups"
-      },
-      {
-          activity: [...],
-          label: "Push Ups"
-      },
-      {
-          activity: [...],
-          label: "Push Ups"
-      }
-    ]
+  /* Training Data
+    {
+        activity: [0.4, -0.4, -10.7, 0,  0,  0],
+        label: "Push Ups"
+    },
+    {
+        activity: [0.4, -0.4, -10.7, 0,  0,  0],
+        label: "Push Ups"
+    }
   */
 
   function togglePort() {
@@ -52,18 +41,14 @@ function device() {
   // Record Activity
 
   function recordActivity(activityName) {
-    var activity = [];
+    var recordedData = [];
 
     parser.on("data", (data) => {
       if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-        activity.push(
-          Object.assign(
-            {},
-            ...data
-              .split(",")
-              .map((x, i) => ({ [`${positions[i]}`]: parseFloat(x) }))
-          )
-        );
+        recordedData.push({
+          activity: data.split(",").map((x, i) => parseFloat(x)),
+          label: activityName,
+        });
       }
     });
 
@@ -72,29 +57,15 @@ function device() {
     }
 
     function stop() {
-      const data = {
-        activity: activity.slice(0, 30),
-        label: activityName,
-      };
-      fs.readFile(`./data/${activityName}.json`, "utf8", (err, prev) => {
-        if (err) {
-          fs.writeFile(
-            `./data/${activityName}.json`,
-            JSON.stringify([data], null, 2),
-            (err) => {
-              togglePort();
-            }
-          );
-        } else {
-          fs.writeFile(
-            `./data/${activityName}.json`,
-            JSON.stringify(JSON.parse(prev).concat(data), null, 2),
-            (err) => {
-              togglePort();
-            }
-          );
+      // Remove duplicates
+
+      fs.writeFile(
+        `./data/${activityName}.json`,
+        JSON.stringify(recordedData, null, 2),
+        (err) => {
+          togglePort();
         }
-      });
+      );
     }
 
     return {
