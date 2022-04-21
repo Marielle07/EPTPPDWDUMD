@@ -86,32 +86,37 @@ export default {
   computed: {
     recordStatus() {
       if (this.progress <= 10 && this.progress >= 0 && this.progress !== null) {
-        ipcRenderer.invoke("start-record-idle", this.$store.state.activityName);
+        if (this.progress === 10) {
+          ipcRenderer.invoke("start-record-idle");
+        }
+
+        if (this.progress === 1) {
+          ipcRenderer.invoke("stop-record-idle");
+        }
         return "started";
       }
+
       if (
         this.activityProgress <= 10 &&
         this.activityProgress >= 0 &&
         this.activityProgress !== null
       ) {
+        if (this.activityProgress === 1) {
+          ipcRenderer.invoke("stop-record-activity");
+        }
         return "activity-started";
-      }
-
-      if (this.progress === 9) {
-        ipcRenderer.invoke("stop-record-idle", this.$store.state.activityName);
       }
 
       if (this.progress < 0) {
         clearInterval(this.interval);
         this.progress = null;
         this.activityProgress = 10;
+        if (this.activityProgress === 10) {
+          ipcRenderer.invoke("start-record-activity");
+        }
         this.interval = setInterval(() => {
           this.activityProgress -= 1;
         }, 1000);
-        ipcRenderer.invoke(
-          "start-record-activity",
-          this.$store.state.activityName
-        );
         return "activity-started";
       }
 
@@ -122,10 +127,7 @@ export default {
           "activities",
           JSON.stringify(this.$store.state.activities)
         );
-        ipcRenderer.invoke(
-          "stop-record-activity",
-          this.$store.state.activityName
-        );
+
         return "completed";
       }
 

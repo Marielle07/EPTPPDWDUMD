@@ -24,6 +24,14 @@ function device() {
       });
     }
   });
+  // parser.on("data", (data) => {
+  //   if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+  //     console.log({
+  //       activity: data.split(",").map((x, i) => parseFloat(x)),
+  //       label: "idle",
+  //     });
+  //   }
+  // });
 
   /* Training Data
     {
@@ -40,25 +48,32 @@ function device() {
     port.isOpen ? port.close() : port.open();
   }
 
-  function recordIdleToggle() {
-    togglePort();
-  }
-
   // Record Activity
 
   function recordActivity(activityName) {
     var recordedData = [];
     var idleData = [];
 
-    function startParser(name) {
-      parser.on("data", (data) => {
-        if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-          idleData.push({
-            activity: data.split(",").map((x, i) => parseFloat(x)),
-            label: name,
-          });
-        }
-      });
+    function startParser(type) {
+      if (type === "idle") {
+        parser.on("data", (data) => {
+          if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+            idleData.push({
+              activity: data.split(",").map((x, i) => parseFloat(x)),
+              label: "idle",
+            });
+          }
+        });
+      } else {
+        parser.on("data", (data) => {
+          if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+            recordedData.push({
+              activity: data.split(",").map((x, i) => parseFloat(x)),
+              label: activityName,
+            });
+          }
+        });
+      }
     }
 
     function startIdle() {

@@ -47,16 +47,19 @@ app.whenReady().then(() => {
   var recorder;
 
   ipc.handle("record-activity", (e, activityName) => {
+    console.log("record activity");
     recorder = device.recordActivity(activityName);
   });
 
   ipc.handle("start-record-idle", () => {
+    console.log("start record idle");
     recorder.startIdle();
   });
   ipc.handle("stop-record-idle", () => {
     recorder.startIdle();
   });
   ipc.handle("start-record-activity", () => {
+    console.log("start record activity");
     recorder.start();
   });
   ipc.handle("stop-record-activity", () => {
