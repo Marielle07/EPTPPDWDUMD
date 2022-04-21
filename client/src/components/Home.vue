@@ -25,7 +25,7 @@
           color="primary"
           label="Exercise Mode"
         />
-        <q-btn
+        <!-- <q-btn
           @click="togglePort"
           no-caps
           push
@@ -45,7 +45,7 @@
           push
           color="primary"
           label="create model"
-        />
+        /> -->
       </div>
     </div>
   </div>

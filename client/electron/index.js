@@ -1,7 +1,7 @@
 const path = require("path");
 const { app, BrowserWindow } = require("electron");
 const ipc = require("electron").ipcMain;
-// const port = require("./scripts/port");
+const port = require("./scripts/port");
 const { network } = require("./scripts/network");
 
 const isDev = process.env.IS_DEV == "true" ? true : false;
@@ -42,25 +42,26 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
-  // const device = port.device();
+  const device = port.device();
   const n = network();
-  // var recorder;
+  var recorder;
 
-  // ipc.handle("toggle-port", () => {
-  //   device.togglePort();
-  // });
+  ipc.handle("record-activity", (e, activityName) => {
+    recorder = device.recordActivity(activityName);
+  });
 
-  // ipc.handle("record-activity", (e, activityName) => {
-  //   recorder = device.recordActivity(activityName);
-  // });
-
-  // ipc.handle("record-activity-start", () => {
-  //   recorder.start();
-  // });
-
-  // ipc.handle("record-activity-stop", () => {
-  //   recorder.stop();
-  // });
+  ipc.handle("start-record-idle", () => {
+    recorder.startIdle();
+  });
+  ipc.handle("stop-record-idle", () => {
+    recorder.startIdle();
+  });
+  ipc.handle("start-record-activity", () => {
+    recorder.start();
+  });
+  ipc.handle("stop-record-activity", () => {
+    recorder.stop();
+  });
 
   ipc.handle("load-data", (e, activityName) => {
     n.loadFile(activityName);

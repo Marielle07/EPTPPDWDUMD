@@ -6,6 +6,8 @@ function device() {
   const port = new SerialPort("COM4", { baudRate: 9600, autoOpen: false });
   const parser = port.pipe(new Readline());
 
+  var idleData = [];
+
   port.on("open", () => {
     console.log("Opened!");
   });
@@ -38,22 +40,39 @@ function device() {
     port.isOpen ? port.close() : port.open();
   }
 
+  function recordIdleToggle() {
+    togglePort();
+  }
+
   // Record Activity
 
   function recordActivity(activityName) {
     var recordedData = [];
+    var idleData = [];
 
-    parser.on("data", (data) => {
-      if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-        recordedData.push({
-          activity: data.split(",").map((x, i) => parseFloat(x)),
-          label: activityName,
-        });
-      }
-    });
+    function startParser(name) {
+      parser.on("data", (data) => {
+        if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+          idleData.push({
+            activity: data.split(",").map((x, i) => parseFloat(x)),
+            label: name,
+          });
+        }
+      });
+    }
+
+    function startIdle() {
+      togglePort();
+      startParser("idle");
+    }
+
+    function stopIdle() {
+      togglePort();
+    }
 
     function start() {
       togglePort();
+      startParser(activityName);
     }
 
     function stop() {
@@ -61,7 +80,7 @@ function device() {
 
       fs.writeFile(
         `./data/${activityName}.json`,
-        JSON.stringify(recordedData, null, 2),
+        JSON.stringify(recordedData.concat(idleData), null, 2),
         (err) => {
           togglePort();
         }
@@ -71,6 +90,8 @@ function device() {
     return {
       start,
       stop,
+      startIdle,
+      stopIdle,
     };
   }
 
