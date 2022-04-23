@@ -10,7 +10,7 @@
 **Change Port**
 
 1. Go to `client/scripts/config.js`
-2. Change com port `js const COM_PORT="<your COM port>";`
+2. Change com port ```js const COM_PORT="<your COM port>";```
 
 ## SERVER - node
 
