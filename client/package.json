@@ -11,7 +11,8 @@
     "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\"",
     "watch:dev": "nodemon --exec npm run electron:dev",
     "electron:builder": "electron-builder",
-    "build:for:electron": "cross-env ELECTRON=true vite build"
+    "build:for:electron": "cross-env ELECTRON=true vite build",
+    "app:build": "yarn build:for:electron && yarn electron:builder"
   },
   "nodemonConfig": {
     "watch": [

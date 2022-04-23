@@ -1,5 +1,5 @@
 const path = require("path");
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Notification } = require("electron");
 const ipc = require("electron").ipcMain;
 const port = require("./scripts/port");
 const { network } = require("./scripts/network");
@@ -34,6 +34,7 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+
 app.whenReady().then(() => {
   createWindow();
   app.on("activate", function () {
@@ -46,6 +47,10 @@ app.whenReady().then(() => {
   const n = network();
   var recorder;
 
+  ipc.handle("toggle-port", () => {
+    device.togglePort();
+  });
+
   ipc.handle("record-activity", (e, activityName) => {
     console.log("record activity");
     recorder = device.recordActivity(activityName);
@@ -55,23 +60,47 @@ app.whenReady().then(() => {
     console.log("start record idle");
     recorder.startIdle();
   });
+
   ipc.handle("stop-record-idle", () => {
     recorder.startIdle();
   });
+
   ipc.handle("start-record-activity", () => {
     console.log("start record activity");
     recorder.start();
   });
+
   ipc.handle("stop-record-activity", () => {
     recorder.stop();
   });
 
-  ipc.handle("load-data", (e, activityName) => {
-    n.loadFile(activityName);
+  ipc.handle("load-data", async (e, activityName) => {
+    const loaded = await n.loadFile(activityName);
+    return loaded;
   });
 
-  ipc.handle("create-model", async () => {
-    await n.predict();
+  ipc.handle("train-posture", async () => {
+    const loaded = await n.trainPosture();
+    return loaded;
+  });
+
+  ipc.handle("predict-start", async (e, activityName) => {
+    n.predict(activityName);
+  });
+
+  ipc.handle("count-cycles", () => {
+    return n.countCycles();
+  });
+
+  ipc.handle("posture-mode", async (e, isEnabled) => {
+    // new Notification({
+    //   title: `Posture mode is ${isEnabled ? "ON" : "OFF"}`,
+    //   body: isEnabled
+    //     ? "Bad posture alert is turned on"
+    //     : "Notifications are turned off",
+    //   sound: "/assets/alert-sound.mp3",
+    // }).show();
+    n.postureMode(isEnabled);
   });
 
   // ipc.handle("start", async (event, data) => {

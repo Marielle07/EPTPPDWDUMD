@@ -25,7 +25,7 @@
           color="primary"
           label="Exercise Mode"
         />
-        <!-- <q-btn
+        <q-btn
           @click="togglePort"
           no-caps
           push
@@ -37,9 +37,9 @@
           no-caps
           push
           color="primary"
-          label="Load Data"
+          label="Train Posture Data"
         />
-        <q-btn
+        <!--<q-btn
           @click="createModel"
           no-caps
           push
@@ -59,7 +59,7 @@ export default {
       ipcRenderer.invoke("toggle-port");
     },
     loadData() {
-      ipcRenderer.invoke("load-data", "Jump");
+      ipcRenderer.invoke("train-posture");
     },
     createModel() {
       ipcRenderer.invoke("create-model");

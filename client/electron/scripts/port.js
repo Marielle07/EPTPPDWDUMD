@@ -1,9 +1,13 @@
 const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
 const fs = require("fs");
+const { COM_PORT } = require("./config");
 
 function device() {
-  const port = new SerialPort("COM4", { baudRate: 9600, autoOpen: false });
+  const port = new SerialPort(COM_PORT, {
+    baudRate: 9600,
+    autoOpen: false,
+  });
   const parser = port.pipe(new Readline());
 
   var idleData = [];
@@ -18,10 +22,12 @@ function device() {
 
   parser.on("data", (data) => {
     if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-      console.log({
-        activity: data.split(",").map((x, i) => parseFloat(x)),
-        label: "idle",
-      });
+      console.log(
+        JSON.stringify({
+          activity: data.split(",").map((x, i) => parseFloat(x)),
+          label: "bad",
+        }) + ","
+      );
     }
   });
   // parser.on("data", (data) => {
@@ -52,53 +58,45 @@ function device() {
 
   function recordActivity(activityName) {
     var recordedData = [];
-    var idleData = [];
+    var type = "";
 
-    function startParser(type) {
-      if (type === "idle") {
-        parser.on("data", (data) => {
-          if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-            idleData.push({
-              activity: data.split(",").map((x, i) => parseFloat(x)),
-              label: "idle",
-            });
-          }
+    parser.on("data", (data) => {
+      if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+        recordedData.push({
+          activity: data.split(",").map((x, i) => parseFloat(x)),
+          label: type,
         });
-      } else {
-        parser.on("data", (data) => {
-          if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-            recordedData.push({
-              activity: data.split(",").map((x, i) => parseFloat(x)),
-              label: activityName,
-            });
-          }
+        console.log({
+          activity: data.split(",").map((x, i) => parseFloat(x)),
+          label: type,
         });
       }
-    }
+    });
 
     function startIdle() {
+      type = "idle";
       togglePort();
-      startParser("idle");
     }
 
     function stopIdle() {
+      console.log(idleData.length);
       togglePort();
     }
 
     function start() {
+      type = activityName;
       togglePort();
-      startParser(activityName);
     }
 
-    function stop() {
+    async function stop() {
       // Remove duplicates
+      console.log(recordedData.length);
+      await togglePort();
 
       fs.writeFile(
         `./data/${activityName}.json`,
-        JSON.stringify(recordedData.concat(idleData), null, 2),
-        (err) => {
-          togglePort();
-        }
+        JSON.stringify(recordedData, null, 2),
+        (err) => {}
       );
     }
 

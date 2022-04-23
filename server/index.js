@@ -1,21 +1,68 @@
 const express = require("express");
-require("dotenv").config();
-const reader = require("./scripts/reader");
+const start = require("./exercise_mongodb");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const db = require(__dirname + "/exercise_mongodb.js");
 const app = express();
 
-app.get("/reader/:direction", async (req, res) => {
-  await reader.readData();
-  await reader.runWorker(req.params.direction);
-  res.send("Scan Done");
+app.set("view engine", "ejs");
+app.use(cors());
+app.use(bodyParser.json());
+
+app.get("/", function (req, res) {
+  async function start() {
+    // FETCH THE DATA FROM THE DATABASE
+    let data = await db("Fetch", "Exercise");
+
+    // PREPARE CONTAINERS
+    dates = [];
+    counters = [];
+    exercise = "Punch";
+
+    console.log(data);
+
+    // PUT DATA TO CONTAINERS
+    data.forEach((value) => {
+      dates.push(value.date);
+      counters.push(value.counter);
+    });
+
+    const datasets = [...new Set(data.map((x) => x.exercise))].map(
+      (exerciseName) => {
+        const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+        return {
+          data: data
+            .filter((x) => x.exercise === exerciseName)
+            .map((y) => ({ x: y.date, y: y.counter })),
+          borderColor: color,
+          backgroundColor: color,
+          label: exerciseName,
+        };
+      }
+    );
+
+    console.log(datasets[0].data[0]);
+
+    // PASS THE DATA TO HTML/EJS FILE
+    res.render("main.ejs", {
+      exercise: exercise,
+      date: dates,
+      counter: counters,
+      datasets,
+    });
+  }
+  start();
 });
 
-app.get("/generate-model", (req, res) => {
-  require("./scripts/model_generator");
-  res.send("Generating Model");
+app.post("/exercise", async (req, res) => {
+  console.log(req);
+  await start("Exercise", req.body);
+  res.send("saved!");
 });
 
-app.get("/prototype", (req, res) => {
-  require("./scripts/prototype");
-});
+const PORT = process.env.PORT || 8080;
 
-app.listen(process.env.PORT);
+app.listen(PORT, () => console.log(`Listening to http://localhost:${PORT}`));
+
+// To run:
+// nodemon index.js

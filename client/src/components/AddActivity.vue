@@ -90,7 +90,7 @@ export default {
           ipcRenderer.invoke("start-record-idle");
         }
 
-        if (this.progress === 1) {
+        if (this.progress === 2) {
           ipcRenderer.invoke("stop-record-idle");
         }
         return "started";

@@ -2,7 +2,20 @@
   <div>
     <div class="header">
       <h3>Posture Mode</h3>
-      <div class="form-control row style">
+      <div>
+        Turning on posture mode will notify you when your posture is bad in more
+        than a minute.
+      </div>
+      <div>
+        <q-toggle
+          size="xl"
+          v-model="isEnabled"
+          val="xl"
+          :label="'Posture Mode is ' + (isEnabled ? 'ON' : 'OFF')"
+          @click="togglePostureMode()"
+        />
+      </div>
+      <!-- <div class="form-control row style">
         Set Timer
         <q-input
           dense
@@ -12,7 +25,7 @@
           label-color="white"
         ></q-input>
         <q-btn label="Start" />
-      </div>
+      </div> -->
       <q-btn
         @click="$router.push('/')"
         color="primary"
@@ -23,7 +36,18 @@
 </template>
 
 <script>
-export default {};
+import { ipcRenderer } from "electron";
+export default {
+  data: () => ({
+    isEnabled: false,
+  }),
+  methods: {
+    togglePostureMode() {
+      console.log("wow");
+      ipcRenderer.invoke("posture-mode", this.isEnabled);
+    },
+  },
+};
 </script>
 
 <style></style>
