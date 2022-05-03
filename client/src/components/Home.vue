@@ -8,7 +8,7 @@
           no-caps
           push
           color="primary"
-          label="Input Data"
+          label="Input Exercise"
         />
         <!-- <q-btn no-caps push color="primary" label="Train Model" /> -->
         <q-btn
@@ -25,7 +25,7 @@
           color="primary"
           label="Exercise Mode"
         />
-        <q-btn
+        <!-- <q-btn
           @click="togglePort"
           no-caps
           push
@@ -38,14 +38,14 @@
           push
           color="primary"
           label="Train Posture Data"
-        />
-        <!--<q-btn
-          @click="createModel"
+        /> -->
+        <q-btn
+          @click="openChart"
           no-caps
           push
           color="primary"
-          label="create model"
-        /> -->
+          label="Open Chart"
+        />
       </div>
     </div>
   </div>
@@ -63,6 +63,9 @@ export default {
     },
     createModel() {
       ipcRenderer.invoke("create-model");
+    },
+    openChart() {
+      ipcRenderer.invoke("open-chart");
     },
   },
   created() {

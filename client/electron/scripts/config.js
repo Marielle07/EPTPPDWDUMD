@@ -1,3 +1,3 @@
-const COM_PORT = "COM5";
+const COM_PORT = "COM4";
 
 module.exports = { COM_PORT };

@@ -88,8 +88,12 @@ app.whenReady().then(() => {
     n.predict(activityName);
   });
 
-  ipc.handle("count-cycles", () => {
-    return n.countCycles();
+  ipc.handle("count-cycles", (e, activityName) => {
+    return n.countCycles(activityName);
+  });
+
+  ipc.handle("open-chart", () => {
+    require("electron").shell.openExternal("http://localhost:8080");
   });
 
   ipc.handle("posture-mode", async (e, isEnabled) => {

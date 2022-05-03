@@ -170,8 +170,9 @@ function network() {
     });
   }
 
-  async function countCycles() {
+  async function countCycles(activityName) {
     await togglePort();
+    //var activityName;
 
     console.log(
       cycles
@@ -179,12 +180,14 @@ function network() {
         .replace(/idle/g, "@@@")
         .split("@@@")
         .filter((x) => x !== "")
+        .filter((x) => x.length > activityName.length * 3).length
     );
     const c = cycles
       .join("")
       .replace(/idle/g, "@@@")
       .split("@@@")
-      .filter((x) => x !== "").length;
+      .filter((x) => x !== "")
+      .filter((x) => x.length > activityName.length * 3).length;
     cycles = [];
     return c;
   }

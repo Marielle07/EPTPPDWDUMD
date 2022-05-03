@@ -21,7 +21,13 @@ function device() {
   });
 
   parser.on("data", (data) => {
-    if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+    if (
+      data.split(",").length === 6 &&
+      !data
+        .split(",")
+        .map((x) => parseFloat(x))
+        .includes(NaN)
+    ) {
       console.log(
         JSON.stringify({
           activity: data.split(",").map((x, i) => parseFloat(x)),

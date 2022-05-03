@@ -136,7 +136,7 @@ export default {
 
       if (this.totalTime < 0) {
         clearInterval(this.interval);
-        ipcRenderer.invoke("count-cycles").then((data) => {
+        ipcRenderer.invoke("count-cycles", this.activityName).then((data) => {
           console.log(data);
           this.totalCycles = data;
           this.saveData();
