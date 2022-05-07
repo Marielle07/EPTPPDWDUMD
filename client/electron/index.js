@@ -2,7 +2,7 @@ const path = require("path");
 const { app, BrowserWindow, Notification } = require("electron");
 const ipc = require("electron").ipcMain;
 const port = require("./scripts/port");
-const { network } = require("./scripts/network");
+const { network, setAction } = require("./scripts/network");
 
 const isDev = process.env.IS_DEV == "true" ? true : false;
 
@@ -52,25 +52,29 @@ app.whenReady().then(() => {
   });
 
   ipc.handle("record-activity", (e, activityName) => {
-    console.log("record activity");
+    port.setAction("record-activity");
     recorder = device.recordActivity(activityName);
   });
 
   ipc.handle("start-record-idle", () => {
     console.log("start record idle");
+    port.setAction("record-activity");
     recorder.startIdle();
   });
 
   ipc.handle("stop-record-idle", () => {
+    port.setAction("record-activity");
     recorder.startIdle();
   });
 
   ipc.handle("start-record-activity", () => {
     console.log("start record activity");
+    port.setAction("record-activity");
     recorder.start();
   });
 
   ipc.handle("stop-record-activity", () => {
+    port.setAction("record-activity");
     recorder.stop();
   });
 
@@ -85,6 +89,8 @@ app.whenReady().then(() => {
   });
 
   ipc.handle("predict-start", async (e, activityName) => {
+    await port.setAction("predict");
+    setAction();
     n.predict(activityName);
   });
 
@@ -104,6 +110,9 @@ app.whenReady().then(() => {
     //     : "Notifications are turned off",
     //   sound: "/assets/alert-sound.mp3",
     // }).show();
+
+    await port.setAction("posture-mode");
+    setAction();
     n.postureMode(isEnabled);
   });
 

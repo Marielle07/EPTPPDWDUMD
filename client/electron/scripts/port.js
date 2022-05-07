@@ -3,39 +3,33 @@ const Readline = require("@serialport/parser-readline");
 const fs = require("fs");
 const { COM_PORT } = require("./config");
 
-function device() {
-  const port = new SerialPort(COM_PORT, {
-    baudRate: 9600,
-    autoOpen: false,
-  });
-  const parser = port.pipe(new Readline());
+const port = new SerialPort(COM_PORT, {
+  baudRate: 9600,
+  autoOpen: false,
+});
+const parser = port.pipe(new Readline());
 
+var _action = "_action";
+
+function device() {
   var idleData = [];
 
-  port.on("open", () => {
-    console.log("Opened!");
-  });
-
-  port.on("close", () => {
-    console.log("Closed!");
-  });
-
-  parser.on("data", (data) => {
-    if (
-      data.split(",").length === 6 &&
-      !data
-        .split(",")
-        .map((x) => parseFloat(x))
-        .includes(NaN)
-    ) {
-      console.log(
-        JSON.stringify({
-          activity: data.split(",").map((x, i) => parseFloat(x)),
-          label: "bad",
-        }) + ","
-      );
-    }
-  });
+  // parser.on("data", (data) => {
+  //   if (
+  //     data.split(",").length === 6 &&
+  //     !data
+  //       .split(",")
+  //       .map((x) => parseFloat(x))
+  //       .includes(NaN)
+  //   ) {
+  //     console.log(
+  //       JSON.stringify({
+  //         activity: data.split(",").map((x, i) => parseFloat(x)),
+  //         label: "bad",
+  //       }) + ","
+  //     );
+  //   }
+  // });
   // parser.on("data", (data) => {
   //   if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
   //     console.log({
@@ -65,23 +59,26 @@ function device() {
   function recordActivity(activityName) {
     var recordedData = [];
     var type = "";
+    console.log(_action);
 
     parser.on("data", (data) => {
-      if (
-        data.split(",").length === 6 &&
-        !data
-          .split(",")
-          .map((x) => parseFloat(x))
-          .includes(NaN)
-      ) {
-        recordedData.push({
-          activity: data.split(",").map((x, i) => parseFloat(x)),
-          label: type,
-        });
-        console.log({
-          activity: data.split(",").map((x, i) => parseFloat(x)),
-          label: type,
-        });
+      if (_action === "record-activity") {
+        if (
+          data.split(",").length === 6 &&
+          !data
+            .split(",")
+            .map((x) => parseFloat(x))
+            .includes(NaN)
+        ) {
+          recordedData.push({
+            activity: data.split(",").map((x, i) => parseFloat(x)),
+            label: type,
+          });
+          console.log({
+            activity: data.split(",").map((x, i) => parseFloat(x)),
+            label: type,
+          });
+        }
       }
     });
 
@@ -108,7 +105,9 @@ function device() {
       fs.writeFile(
         `./data/${activityName}.json`,
         JSON.stringify(recordedData, null, 2),
-        (err) => {}
+        (err) => {
+          recordedData = [];
+        }
       );
     }
 
@@ -126,4 +125,12 @@ function device() {
   };
 }
 
-module.exports = { device };
+function setAction(value) {
+  _action = value;
+}
+
+function getAction() {
+  return _action;
+}
+
+module.exports = { device, port, parser, getAction, setAction };

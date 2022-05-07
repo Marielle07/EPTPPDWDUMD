@@ -1,18 +1,14 @@
 const tf = require("@tensorflow/tfjs-node");
 const fs = require("fs");
-const SerialPort = require("serialport");
-const Readline = require("@serialport/parser-readline");
-const { COM_PORT } = require("./config");
 const { Notification } = require("electron");
+
+const { port, parser, getAction } = require("./port");
+
+var _action = getAction();
+
 function network() {
   var trainingData;
   var cycles = [];
-
-  const port = new SerialPort(COM_PORT, {
-    baudRate: 9600,
-    autoOpen: false,
-  });
-  const parser = port.pipe(new Readline());
 
   port.on("open", () => {
     console.log("Opened!");
@@ -156,17 +152,20 @@ function network() {
     model = await tf.loadLayersModel("file://model/model.json");
 
     parser.on("data", (data) => {
-      if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-        tf.tidy(() => {
-          const input = tf.tensor2d([
-            data.split(",").map((x, i) => parseFloat(x)),
-          ]);
-          const prediction = model.predict(input);
-          const gesturePredicted = labels[prediction.argMax(-1).dataSync()[0]];
-          cycles.push(gesturePredicted);
+      if (_action === "predict") {
+        if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+          tf.tidy(() => {
+            const input = tf.tensor2d([
+              data.split(",").map((x, i) => parseFloat(x)),
+            ]);
+            const prediction = model.predict(input);
+            const gesturePredicted =
+              labels[prediction.argMax(-1).dataSync()[0]];
+            cycles.push(gesturePredicted);
 
-          console.log(gesturePredicted);
-        });
+            console.log(gesturePredicted);
+          });
+        }
       }
     });
   }
@@ -193,36 +192,41 @@ function network() {
     return c;
   }
 
+  var triggered = false;
   async function postureMode(isEnabled) {
     togglePort();
+    _action = getAction();
+
+    console.log(_action);
 
     const labels = ["good", "bad"];
 
     model = await tf.loadLayersModel("file://posture/model.json");
     if (isEnabled) {
-      var triggered = false;
       var badPosture = false;
 
       parser.on("data", (data) => {
-        if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
-          tf.tidy(() => {
-            const input = tf.tensor2d([
-              data.split(",").map((x, i) => parseFloat(x)),
-            ]);
-            const prediction = model.predict(input);
-            const gesturePredicted =
-              labels[prediction.argMax(-1).dataSync()[0]];
-            cycles.push(gesturePredicted);
-            badPosture = gesturePredicted === "bad" ? true : false;
-            console.log(gesturePredicted);
-          });
-          if (badPosture) {
-            if (!triggered) {
-              badPostureDetected();
-              triggered = true;
+        if (_action === "posture-mode") {
+          if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+            tf.tidy(() => {
+              const input = tf.tensor2d([
+                data.split(",").map((x, i) => parseFloat(x)),
+              ]);
+              const prediction = model.predict(input);
+              const gesturePredicted =
+                labels[prediction.argMax(-1).dataSync()[0]];
+              cycles.push(gesturePredicted);
+              badPosture = gesturePredicted === "bad" ? true : false;
+              console.log(gesturePredicted);
+            });
+            if (badPosture) {
+              if (!triggered) {
+                badPostureDetected();
+                triggered = true;
+              }
+            } else {
+              triggered = false;
             }
-          } else {
-            triggered = false;
           }
         }
       });
@@ -233,10 +237,12 @@ function network() {
   function badPostureDetected() {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      new Notification({
-        title: "Bad Posture Detected",
-      }).show();
-    }, 1000 * 60);
+      if (triggered) {
+        new Notification({
+          title: "Bad Posture Detected",
+        }).show();
+      }
+    }, 1000 * 3);
   }
 
   return {
@@ -250,4 +256,8 @@ function network() {
   };
 }
 
-module.exports = { network };
+function setAction() {
+  _action = getAction();
+}
+
+module.exports = { network, setAction };
