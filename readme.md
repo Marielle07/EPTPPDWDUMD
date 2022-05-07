@@ -5,12 +5,12 @@
 1. `cd client`
 1. install packages `npm i`
 1. rebuild electron `npx electron-rebuild`
-1. run dev server in watch mode `npm run watch:dev`
+1. run dev server in watch mode ` `
 
 **Change Port**
 
 1. Go to `client/scripts/config.js`
-2. Change com port ```js const COM_PORT="<your COM port>";```
+2. Change com port `js const COM_PORT="<your COM port>";`
 
 ## SERVER - node
 

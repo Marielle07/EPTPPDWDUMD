@@ -6,6 +6,7 @@ const { COM_PORT } = require("./config");
 const { Notification } = require("electron");
 function network() {
   var trainingData;
+  var cycles = [];
 
   const port = new SerialPort(COM_PORT, {
     baudRate: 9600,
@@ -19,6 +20,8 @@ function network() {
 
   port.on("close", () => {
     console.log("Closed!");
+    trainingData = null;
+    cycles = [];
   });
 
   // setup data
@@ -136,11 +139,9 @@ function network() {
 
   async function createModel() {}
 
-  function togglePort() {
+  async function togglePort() {
     port.isOpen ? port.close() : port.open();
   }
-
-  var cycles = [];
 
   async function predict(activityName) {
     togglePort();

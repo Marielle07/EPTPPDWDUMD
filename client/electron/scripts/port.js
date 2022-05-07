@@ -67,7 +67,13 @@ function device() {
     var type = "";
 
     parser.on("data", (data) => {
-      if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
+      if (
+        data.split(",").length === 6 &&
+        !data
+          .split(",")
+          .map((x) => parseFloat(x))
+          .includes(NaN)
+      ) {
         recordedData.push({
           activity: data.split(",").map((x, i) => parseFloat(x)),
           label: type,

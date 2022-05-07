@@ -41,7 +41,7 @@ app.get("/", function (req, res) {
       }
     );
 
-    console.log(datasets[0].data[0]);
+    //console.log(datasets[0].data[0]);
 
     // PASS THE DATA TO HTML/EJS FILE
     res.render("main.ejs", {

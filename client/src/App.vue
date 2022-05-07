@@ -1,9 +1,15 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="slide">
-      <component :is="Component" />
-    </transition>
-  </router-view>
+  <div>
+    <router-view v-slot="{ Component }">
+      <transition name="slide">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+    <!-- <img
+      src="https://upload.wikimedia.org/wikipedia/en/9/95/Test_image.jpg"
+      style="margin: 25px; opacity: 100%"
+    /> -->
+  </div>
 </template>
 
 <script>

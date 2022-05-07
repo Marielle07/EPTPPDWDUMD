@@ -1,14 +1,15 @@
 <template>
   <div>
+    <!-- <img src="../logo1.png" style="margin: 25px; opacity: 100%" /> -->
     <div class="header">
-      <h3>Main Menu</h3>
+      <h4>Main Menu</h4>
       <div class="buttons">
         <q-btn
           @click="$router.push('/input-data')"
           no-caps
           push
           color="primary"
-          label="Input Exercise"
+          label="Create New Exercise"
         />
         <!-- <q-btn no-caps push color="primary" label="Train Model" /> -->
         <q-btn
@@ -44,7 +45,7 @@
           no-caps
           push
           color="primary"
-          label="Open Chart"
+          label="View Exercise Progress"
         />
       </div>
     </div>
@@ -53,6 +54,7 @@
 
 <script>
 import { ipcRenderer } from "electron";
+
 export default {
   methods: {
     togglePort() {
@@ -82,7 +84,7 @@ export default {
 .header {
   height: 100vh;
   width: 100vw;
-  padding: 20px;
+  padding: 10px;
   // background: linear-gradient(to right, rgb(117, 170, 248), rgb(71, 142, 248));
   color: white;
   text-align: center;
@@ -90,7 +92,7 @@ export default {
   justify-content: center;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 20px;
 }
 .buttons {
   display: flex;
