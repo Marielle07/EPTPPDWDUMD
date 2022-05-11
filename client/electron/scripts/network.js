@@ -65,14 +65,17 @@ function network() {
       })
     );
 
+    // Compile layers
     model.compile({
       loss: "meanSquaredError",
       optimizer: tf.train.adam(0.1),
     });
 
+    // Fit / Train the model
     await model.fit(trainingData, outputData, { epochs: 40 });
 
-    await model.save("file://model");
+    // Save the model
+    await model.save("file://model"); // <------ we'll be using this for prediction
 
     return true;
   }
@@ -152,7 +155,7 @@ function network() {
     model = await tf.loadLayersModel("file://model/model.json");
 
     parser.on("data", (data) => {
-      if (_action === "predict") {
+      if (_action === "predict" && activityName === labels[1]) {
         if (!isNaN(data.split(",").map((x) => parseFloat(x))[0])) {
           tf.tidy(() => {
             const input = tf.tensor2d([
